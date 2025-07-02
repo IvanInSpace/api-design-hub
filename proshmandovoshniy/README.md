@@ -66,9 +66,9 @@ src/
 
 ### MVP (Current Phase)
 - [x] Project setup and architecture
-- [ ] Basic two-panel layout
-- [ ] OpenAPI block components
-- [ ] YAML generation engine
+- [x] Basic two-panel layout
+- [x] OpenAPI block components
+- [x] YAML generation engine
 - [ ] Template auto-completion
 - [ ] Example generation
 
