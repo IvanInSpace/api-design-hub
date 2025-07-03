@@ -87,6 +87,12 @@
   transition: all 0.2s ease;
   cursor: pointer;
   width: 100%;
+  background-color: var(--bg-primary);
+}
+
+.method-label.selected {
+  font-weight: 600;
+  box-shadow: 0 0 0 1px var(--accent-color);
 }
 
 .method-checkbox input[type="checkbox"]:checked + .method-label {
@@ -136,6 +142,61 @@
 .method-checkbox input[type="checkbox"]:checked + .method-head { 
   background-color: #84cc16; 
   border-color: #84cc16; 
+}
+
+/* Selected Methods Preview */
+.selected-methods-preview {
+  margin-top: var(--spacing-sm);
+  padding: var(--spacing-sm);
+  background-color: var(--bg-tertiary);
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  flex-wrap: wrap;
+}
+
+.preview-label {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.method-badge {
+  font-size: 0.625rem;
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: var(--radius-sm);
+  color: white;
+  text-transform: uppercase;
+}
+
+.method-badge.method-get {
+  background-color: #10b981;
+}
+
+.method-badge.method-post {
+  background-color: #3b82f6;
+}
+
+.method-badge.method-put {
+  background-color: #f59e0b;
+}
+
+.method-badge.method-delete {
+  background-color: #ef4444;
+}
+
+.method-badge.method-patch {
+  background-color: #8b5cf6;
+}
+
+.method-badge.method-options {
+  background-color: #6b7280;
+}
+
+.method-badge.method-head {
+  background-color: #84cc16;
 }
 
 /* Section Headers */

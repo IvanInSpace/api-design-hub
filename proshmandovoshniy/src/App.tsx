@@ -1,11 +1,17 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useMemo } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { Layout, BlockEditor, YamlViewer } from './components';
+import NotificationProvider from './components/Common/Notifications/NotificationProvider';
+import NotificationContainer from './components/Common/Notifications/NotificationContainer';
+import AISuggestionPanel from './components/Common/AISuggestionPanel';
+import { useAISuggestions } from './hooks/useAISuggestions';
+import OpenAIAssistant from './utils/openAIAssistant';
 import { YamlGenerator } from './utils';
 import { BlockType } from './types/openapi';
 import './styles/index.css';
 
-function App() {
+// Inner component that uses the notification context
+function AppInner() {
   const [blocks, setBlocks] = useState<BlockType[]>([
     {
       id: 'info-default',
@@ -22,9 +28,44 @@ function App() {
   
   const [selectedBlock, setSelectedBlock] = useState<string | null>('info-default');
   const [theme, setTheme] = useState<'light' | 'dark'>('light');
+  const [aiPanelVisible, setAiPanelVisible] = useState(false);
+  const [openAIToken, setOpenAIToken] = useState<string>('');
 
   // Generate YAML from current blocks
   const yamlContent = YamlGenerator.generateFromBlocks(blocks);
+
+  // Create OpenAI assistant when token is available
+  const openAIAssistant = useMemo(() => {
+    if (!openAIToken) return null;
+    return new OpenAIAssistant({ apiKey: openAIToken });
+  }, [openAIToken]);
+
+  // Handle YAML changes from AI suggestions
+  const handleYamlChange = useCallback((newYamlContent: string) => {
+    try {
+      const importedBlocks = YamlGenerator.parseYamlToBlocks(newYamlContent);
+      if (importedBlocks.length > 0) {
+        setBlocks(importedBlocks);
+      }
+    } catch (error) {
+      console.error('Failed to update blocks from AI suggestion:', error);
+    }
+  }, []);
+
+  // Initialize AI suggestions hook
+  const {
+    suggestions,
+    isAnalyzing,
+    acceptSuggestion,
+    rejectSuggestion,
+    refreshSuggestions,
+    clearAllSuggestions
+  } = useAISuggestions(yamlContent, handleYamlChange, {
+    debounceMs: 1500,
+    maxSuggestions: 8,
+    enableAutoAnalysis: true,
+    assistant: openAIAssistant
+  });
 
   const handleThemeToggle = useCallback(() => {
     setTheme(prev => prev === 'light' ? 'dark' : 'light');
@@ -34,12 +75,21 @@ function App() {
     setSelectedBlock(blockId);
   }, []);
 
-  const handleBlockUpdate = useCallback((blockId: string, data: any) => {
-    setBlocks(prev => prev.map(block => 
-      block.id === blockId 
-        ? { ...block, data: { ...block.data, ...data } }
-        : block
-    ));
+  const handleBlockUpdate = useCallback((blockId: string, updates: any) => {
+    setBlocks(prev => prev.map(block => {
+      if (block.id === blockId) {
+        // Если обновляется expanded, то это изменение самого блока
+        if ('expanded' in updates && Object.keys(updates).length === 1) {
+          return { ...block, expanded: updates.expanded };
+        }
+        // Иначе это обновление данных блока
+        return { 
+          ...block, 
+          data: { ...block.data, ...updates }
+        };
+      }
+      return block;
+    }));
   }, []);
 
   const handleBlockAdd = useCallback((type: BlockType['type']) => {
@@ -93,23 +143,40 @@ function App() {
   }, [yamlContent]);
 
   return (
-    <Layout theme={theme} onThemeToggle={handleThemeToggle}>
-      <BlockEditor
-        blocks={blocks}
-        selectedBlock={selectedBlock}
-        onBlockSelect={handleBlockSelect}
-        onBlockUpdate={handleBlockUpdate}
-        onBlockAdd={handleBlockAdd}
-        onBlockDelete={handleBlockDelete}
-        onApplyTemplate={handleApplyTemplate}
+    <>
+      <Layout 
+        theme={theme} 
+        onThemeToggle={handleThemeToggle}
+        onTokenChange={setOpenAIToken}
+      >
+        <BlockEditor
+          blocks={blocks}
+          selectedBlock={selectedBlock}
+          onBlockSelect={handleBlockSelect}
+          onBlockUpdate={handleBlockUpdate}
+          onBlockAdd={handleBlockAdd}
+          onBlockDelete={handleBlockDelete}
+          onApplyTemplate={handleApplyTemplate}
+        />
+        
+        <YamlViewer
+          yamlContent={yamlContent}
+          onImport={handleYamlImport}
+          onExport={handleYamlExport}
+        />
+      </Layout>
+      
+      <AISuggestionPanel
+        suggestions={suggestions}
+        onAcceptSuggestion={acceptSuggestion}
+        onRejectSuggestion={rejectSuggestion}
+        isVisible={aiPanelVisible}
+        onToggle={() => setAiPanelVisible(!aiPanelVisible)}
+        isProcessing={isAnalyzing}
       />
       
-      <YamlViewer
-        yamlContent={yamlContent}
-        onImport={handleYamlImport}
-        onExport={handleYamlExport}
-      />
-    </Layout>
+      <NotificationContainer />
+    </>
   );
 }
 
@@ -153,6 +220,15 @@ function getDefaultData(type: BlockType['type']): any {
     default:
       return {};
   }
+}
+
+// Main App component with NotificationProvider wrapper
+function App() {
+  return (
+    <NotificationProvider>
+      <AppInner />
+    </NotificationProvider>
+  );
 }
 
 export default App;

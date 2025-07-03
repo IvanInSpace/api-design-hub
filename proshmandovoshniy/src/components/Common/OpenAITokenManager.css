@@ -1,0 +1,149 @@
+.openai-token-manager {
+  position: relative;
+  display: inline-block;
+}
+
+.openai-status-button {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 8px 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 14px;
+  color: var(--text-primary);
+  min-width: 140px;
+  min-height: 44px;
+}
+
+.openai-status-button:hover {
+  background: var(--bg-tertiary);
+  border-color: var(--accent-color);
+}
+
+.openai-status-button.connected {
+  border-color: var(--color-success);
+  background: linear-gradient(135deg, rgba(40, 167, 69, 0.1) 0%, var(--bg-secondary) 100%);
+}
+
+.openai-status-button.disconnected {
+  border-color: var(--color-error);
+  background: linear-gradient(135deg, rgba(220, 53, 69, 0.1) 0%, var(--bg-secondary) 100%);
+}
+
+.status-icon {
+  font-size: 16px;
+}
+
+.status-text {
+  font-weight: 500;
+  font-size: 13px;
+  flex: 1;
+}
+
+.dropdown-arrow {
+  font-size: 10px;
+  color: var(--text-secondary);
+}
+
+.token-dropdown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 4px;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  z-index: 1000;
+  width: 300px;
+  overflow: hidden;
+}
+
+.dropdown-header {
+  padding: 16px 20px 12px;
+  border-bottom: 1px solid var(--border-color);
+  background: var(--bg-secondary);
+}
+
+.dropdown-header h3 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.dropdown-content {
+  padding: 20px;
+}
+
+.token-input-section {
+  margin-bottom: 16px;
+}
+
+.token-input-section label {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.token-input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+}
+
+.token-input:focus {
+  outline: none;
+  border-color: var(--accent-color);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.button-group {
+  display: flex;
+  gap: 8px;
+}
+
+.save-button,
+.clear-button {
+  flex: 1;
+  padding: 10px 16px;
+  border-radius: var(--radius-md);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.save-button {
+  background: var(--accent-color);
+  border: 1px solid var(--accent-color);
+  color: white;
+}
+
+.save-button:hover {
+  background: var(--accent-hover);
+  border-color: var(--accent-hover);
+}
+
+.clear-button {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+}
+
+.clear-button:hover {
+  background: var(--bg-tertiary);
+  border-color: var(--color-error);
+  color: var(--color-error);
+}

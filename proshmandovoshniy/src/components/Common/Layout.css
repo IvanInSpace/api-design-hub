@@ -70,6 +70,11 @@
   transition: all 0.2s ease;
   color: var(--text-primary);
   background-color: var(--bg-primary);
+  min-width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .theme-toggle:hover {

@@ -139,19 +139,32 @@ const PathForm: React.FC<PathFormProps> = ({ data, onUpdate }) => {
             <div className="form-field">
               <label className="field-label">HTTP Methods</label>
               <div className="methods-grid">
-                {['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS', 'HEAD'].map(method => (
-                  <label key={method} className="method-checkbox">
-                    <input
-                      type="checkbox"
-                      checked={data.methods?.includes(method.toLowerCase()) || false}
-                      onChange={() => handleMethodToggle(method.toLowerCase())}
-                    />
-                    <span className={`method-label method-${method.toLowerCase()}`}>
-                      {method}
-                    </span>
-                  </label>
-                ))}
+                {['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS', 'HEAD'].map(method => {
+                  const isSelected = data.methods?.includes(method.toLowerCase()) || false;
+                  return (
+                    <label key={method} className="method-checkbox">
+                      <input
+                        type="checkbox"
+                        checked={isSelected}
+                        onChange={() => handleMethodToggle(method.toLowerCase())}
+                      />
+                      <span className={`method-label method-${method.toLowerCase()} ${isSelected ? 'selected' : ''}`}>
+                        {method}
+                      </span>
+                    </label>
+                  );
+                })}
               </div>
+              {data.methods && data.methods.length > 0 && (
+                <div className="selected-methods-preview">
+                  <span className="preview-label">Selected methods:</span>
+                  {data.methods.map((method: string) => (
+                    <span key={method} className={`method-badge method-${method}`}>
+                      {method.toUpperCase()}
+                    </span>
+                  ))}
+                </div>
+              )}
             </div>
 
             <div className="form-field">

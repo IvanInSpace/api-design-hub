@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { BlockType } from '../../types/openapi';
 import PathForm from './Forms/PathForm';
 import TemplateSelector from '../Common/TemplateSelector';
+import SearchAndFilter from '../Common/SearchAndFilter';
 import './BlockEditor.css';
 
 interface BlockEditorProps {
@@ -56,6 +57,39 @@ const BlockEditor: React.FC<BlockEditorProps> = ({
     // to the newly created block
   };
 
+  const handleBlockAdd = (type: BlockType['type']) => {
+    // Проверяем уникальность для определенных типов блоков
+    const uniqueTypes = ['info'];
+    if (uniqueTypes.includes(type)) {
+      const existingBlock = blocks.find(block => block.type === type);
+      if (existingBlock) {
+        alert(`Block of type "${blockTypeLabels[type]}" already exists. Only one block of this type is allowed.`);
+        return;
+      }
+    }
+    
+    onBlockAdd(type);
+    setShowAddDropdown(false);
+  };
+
+  const handleBlockDelete = (blockId: string, blockType: BlockType['type']) => {
+    // Проверяем, является ли блок обязательным
+    const requiredTypes = ['info'];
+    if (requiredTypes.includes(blockType)) {
+      alert(`Block of type "${blockTypeLabels[blockType]}" is required and cannot be deleted. Every OpenAPI specification must have this block.`);
+      return;
+    }
+    
+    if (window.confirm('Are you sure you want to delete this block?')) {
+      onBlockDelete(blockId);
+    }
+  };
+
+  const isBlockRequired = (blockType: BlockType['type']) => {
+    const requiredTypes = ['info'];
+    return requiredTypes.includes(blockType);
+  };
+
   return (
     <div className="block-editor">
       <div className="editor-toolbar">
@@ -83,19 +117,24 @@ const BlockEditor: React.FC<BlockEditorProps> = ({
             </button>
             {showAddDropdown && (
               <div className="dropdown-content">
-                {Object.entries(blockTypeLabels).map(([type, label]) => (
-                  <button
-                    key={type}
-                    className="dropdown-item"
-                    onClick={() => {
-                      onBlockAdd(type as BlockType['type']);
-                      setShowAddDropdown(false);
-                    }}
-                  >
-                    <span className="item-icon">{blockTypeIcons[type as keyof typeof blockTypeIcons]}</span>
-                    {label}
-                  </button>
-                ))}
+                {Object.entries(blockTypeLabels).map(([type, label]) => {
+                  const isUnique = ['info'].includes(type);
+                  const hasExisting = isUnique && blocks.find(block => block.type === type);
+                  
+                  return (
+                    <button
+                      key={type}
+                      className={`dropdown-item ${hasExisting ? 'disabled' : ''}`}
+                      onClick={() => handleBlockAdd(type as BlockType['type'])}
+                      disabled={hasExisting}
+                      title={hasExisting ? `${label} block already exists` : `Add ${label} block`}
+                    >
+                      <span className="item-icon">{blockTypeIcons[type as keyof typeof blockTypeIcons]}</span>
+                      {label}
+                      {hasExisting && <span className="exists-badge">EXISTS</span>}
+                    </button>
+                  );
+                })}
               </div>
             )}
           </div>
@@ -103,6 +142,14 @@ const BlockEditor: React.FC<BlockEditorProps> = ({
       </div>
 
       <div className="blocks-container">
+        {blocks.length > 3 && (
+          <SearchAndFilter
+            blocks={blocks}
+            onBlockSelect={onBlockSelect}
+            selectedBlock={selectedBlock}
+          />
+        )}
+        
         {blocks.length === 0 ? (
           <div className="empty-state">
             <div className="empty-icon">📝</div>
@@ -124,7 +171,9 @@ const BlockEditor: React.FC<BlockEditorProps> = ({
               key={block.id}
               className={`block-item ${
                 selectedBlock === block.id ? 'selected' : ''
-              } ${block.expanded ? 'expanded' : ''}`}
+              } ${block.expanded ? 'expanded' : ''} ${
+                isBlockRequired(block.type) ? 'required' : ''
+              }`}
               onClick={() => onBlockSelect(block.id)}
             >
               <div className="block-header">
@@ -133,7 +182,12 @@ const BlockEditor: React.FC<BlockEditorProps> = ({
                     {blockTypeIcons[block.type]}
                   </span>
                   <div className="block-text">
-                    <h4 className="block-title">{block.title}</h4>
+                    <h4 className="block-title">
+                      {block.title}
+                      {isBlockRequired(block.type) && (
+                        <span className="required-badge">Required</span>
+                      )}
+                    </h4>
                     <span className="block-type">{blockTypeLabels[block.type]}</span>
                   </div>
                 </div>
@@ -149,16 +203,15 @@ const BlockEditor: React.FC<BlockEditorProps> = ({
                     {block.expanded ? '🔽' : '▶️'}
                   </button>
                   <button
-                    className="action-btn delete-btn"
+                    className={`action-btn delete-btn ${isBlockRequired(block.type) ? 'disabled' : ''}`}
                     onClick={(e) => {
                       e.stopPropagation();
-                      if (window.confirm('Are you sure you want to delete this block?')) {
-                        onBlockDelete(block.id);
-                      }
+                      handleBlockDelete(block.id, block.type);
                     }}
-                    title="Delete block"
+                    title={isBlockRequired(block.type) ? 'Required block cannot be deleted' : 'Delete block'}
+                    disabled={isBlockRequired(block.type)}
                   >
-                    🗑️
+                    {isBlockRequired(block.type) ? '🔒' : '🗑️'}
                   </button>
                 </div>
               </div>

@@ -1,13 +1,20 @@
 import React from 'react';
+import OpenAITokenManager from './OpenAITokenManager';
 import './Layout.css';
 
 interface LayoutProps {
   children: [React.ReactNode, React.ReactNode]; // [LeftPanel, RightPanel]
   theme: 'light' | 'dark';
   onThemeToggle: () => void;
+  onTokenChange: (token: string) => void;
 }
 
-const Layout: React.FC<LayoutProps> = ({ children, theme, onThemeToggle }) => {
+const Layout: React.FC<LayoutProps> = ({ 
+  children, 
+  theme, 
+  onThemeToggle,
+  onTokenChange
+}) => {
   const [leftPanel, rightPanel] = children;
 
   return (
@@ -23,6 +30,8 @@ const Layout: React.FC<LayoutProps> = ({ children, theme, onThemeToggle }) => {
           </div>
           
           <div className="header-actions">
+            <OpenAITokenManager onTokenChange={onTokenChange} />
+            
             <button 
               className="theme-toggle"
               onClick={onThemeToggle}

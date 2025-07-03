@@ -1,0 +1,202 @@
+/* NotificationContainer.css - Modern notification system styles */
+
+.notification-container {
+  position: fixed;
+  top: var(--spacing-xl);
+  right: var(--spacing-xl);
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  max-width: 400px;
+  pointer-events: none;
+}
+
+.notification-item {
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  padding: var(--spacing-lg);
+  display: flex;
+  align-items: flex-start;
+  gap: var(--spacing-md);
+  transform: translateX(100%);
+  opacity: 0;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  pointer-events: auto;
+  backdrop-filter: blur(8px);
+  border-left-width: 4px;
+}
+
+.notification-item.visible {
+  transform: translateX(0);
+  opacity: 1;
+}
+
+.notification-item.exiting {
+  transform: translateX(100%);
+  opacity: 0;
+}
+
+/* Notification Types */
+.notification-item.success {
+  border-left-color: #10b981;
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.05) 0%, var(--bg-primary) 100%);
+}
+
+.notification-item.error {
+  border-left-color: #ef4444;
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.05) 0%, var(--bg-primary) 100%);
+}
+
+.notification-item.warning {
+  border-left-color: #f59e0b;
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.05) 0%, var(--bg-primary) 100%);
+}
+
+.notification-item.info {
+  border-left-color: #3b82f6;
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.05) 0%, var(--bg-primary) 100%);
+}
+
+.notification-icon {
+  font-size: 1.25rem;
+  line-height: 1;
+  margin-top: 2px;
+}
+
+.notification-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.notification-title {
+  font-weight: 600;
+  font-size: 0.875rem;
+  color: var(--text-primary);
+  line-height: 1.4;
+}
+
+.notification-message {
+  font-size: 0.8125rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+
+.notification-actions {
+  display: flex;
+  gap: var(--spacing-xs);
+  margin-top: var(--spacing-sm);
+}
+
+.notification-action {
+  font-size: 0.75rem;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-color);
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-weight: 500;
+}
+
+.notification-action:hover {
+  background: var(--bg-tertiary);
+  transform: translateY(-1px);
+}
+
+.notification-action.primary {
+  background: var(--accent-color);
+  border-color: var(--accent-color);
+  color: white;
+}
+
+.notification-action.primary:hover {
+  background: var(--accent-hover);
+  border-color: var(--accent-hover);
+}
+
+.notification-close {
+  background: none;
+  border: none;
+  font-size: 1rem;
+  color: var(--text-secondary);
+  cursor: pointer;
+  padding: var(--spacing-xs);
+  border-radius: var(--radius-sm);
+  transition: all 0.2s ease;
+  line-height: 1;
+  margin-top: -2px;
+}
+
+.notification-close:hover {
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  transform: scale(1.1);
+}
+
+/* Dark theme adjustments */
+[data-theme="dark"] .notification-item {
+  backdrop-filter: blur(12px);
+  border-color: var(--border-color);
+}
+
+[data-theme="dark"] .notification-item.success {
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, var(--bg-primary) 100%);
+}
+
+[data-theme="dark"] .notification-item.error {
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, var(--bg-primary) 100%);
+}
+
+[data-theme="dark"] .notification-item.warning {
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, var(--bg-primary) 100%);
+}
+
+[data-theme="dark"] .notification-item.info {
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, var(--bg-primary) 100%);
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .notification-container {
+    top: var(--spacing-md);
+    right: var(--spacing-md);
+    left: var(--spacing-md);
+    max-width: none;
+  }
+  
+  .notification-item {
+    padding: var(--spacing-md);
+  }
+  
+  .notification-actions {
+    flex-direction: column;
+  }
+  
+  .notification-action {
+    text-align: center;
+  }
+}
+
+/* Stacking animation */
+.notification-item:not(:first-child) {
+  margin-top: calc(-1 * var(--spacing-sm));
+  transform: translateX(100%) scale(0.95);
+}
+
+.notification-item.visible:not(:first-child) {
+  transform: translateX(0) scale(0.95);
+}
+
+.notification-item:first-child {
+  transform: translateX(100%) scale(1);
+}
+
+.notification-item.visible:first-child {
+  transform: translateX(0) scale(1);
+}

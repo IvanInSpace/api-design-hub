@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import * as yaml from 'js-yaml';
 import ValidationPanel from './ValidationPanel';
+import ExportImportModal from '../Common/ExportImportModal';
 import OpenAPIValidator, { ValidationResult } from '../../utils/openApiValidator';
 import ExampleGenerator from '../../utils/exampleGenerator';
 import { OpenAPISpec } from '../../types/openapi';
@@ -21,6 +22,7 @@ const YamlViewer: React.FC<YamlViewerProps> = ({
 }) => {
   const [copied, setCopied] = useState(false);
   const [showValidation, setShowValidation] = useState(true);
+  const [showExportImport, setShowExportImport] = useState(false);
 
   // Parse and validate YAML content
   const validationResult: ValidationResult = useMemo(() => {
@@ -113,33 +115,22 @@ const YamlViewer: React.FC<YamlViewerProps> = ({
           
           <button
             className="action-btn download-btn"
-            onClick={handleDownload}
-            title="Download YAML file"
+            onClick={() => setShowExportImport(true)}
+            title="Export or import specification"
             disabled={!yamlContent.trim()}
           >
             <span className="btn-icon">💾</span>
-            Download
+            Export
           </button>
           
-          {onImport && (
-            <>
-              <input
-                type="file"
-                accept=".yaml,.yml,.json"
-                onChange={handleFileUpload}
-                style={{ display: 'none' }}
-                id="yaml-file-input"
-              />
-              <button
-                className="action-btn upload-btn"
-                onClick={() => document.getElementById('yaml-file-input')?.click()}
-                title="Import YAML file"
-              >
-                <span className="btn-icon">📁</span>
-                Import
-              </button>
-            </>
-          )}
+          <button
+            className="action-btn upload-btn"
+            onClick={() => setShowExportImport(true)}
+            title="Import specification"
+          >
+            <span className="btn-icon">📁</span>
+            Import
+          </button>
           
           {onExport && (
             <button
@@ -202,6 +193,13 @@ const YamlViewer: React.FC<YamlViewerProps> = ({
         validationResult={validationResult}
         isVisible={showValidation}
         onToggle={() => setShowValidation(!showValidation)}
+      />
+      
+      <ExportImportModal
+        isOpen={showExportImport}
+        onClose={() => setShowExportImport(false)}
+        yamlContent={yamlContent}
+        onImport={onImport || (() => {})}
       />
     </div>
   );
