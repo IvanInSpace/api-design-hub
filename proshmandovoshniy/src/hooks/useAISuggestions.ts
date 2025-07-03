@@ -18,6 +18,7 @@ interface UseAISuggestionsReturn {
   rejectSuggestion: (suggestionId: string) => void;
   refreshSuggestions: () => void;
   clearAllSuggestions: () => void;
+  analyzeManually: () => void; // Новый метод для ручного анализа
 }
 
 export const useAISuggestions = (
@@ -28,7 +29,7 @@ export const useAISuggestions = (
   const {
     debounceMs = 1000,
     maxSuggestions = 10,
-    enableAutoAnalysis = true,
+    enableAutoAnalysis = false, // Изменили с true на false
     assistant
   } = options;
 
@@ -146,13 +147,19 @@ export const useAISuggestions = (
     setRejectedSuggestionIds(new Set());
   }, []);
 
+  // Ручной анализ
+  const analyzeManually = useCallback(() => {
+    analyzeSuggestions();
+  }, [analyzeSuggestions]);
+
   return {
     suggestions,
     isAnalyzing,
     acceptSuggestion,
     rejectSuggestion,
     refreshSuggestions,
-    clearAllSuggestions
+    clearAllSuggestions,
+    analyzeManually
   };
 };
 

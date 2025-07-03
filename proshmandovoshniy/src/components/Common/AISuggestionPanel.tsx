@@ -1,5 +1,5 @@
 import React, { useState, useCallback } from 'react';
-import { AISuggestion } from '../../utils/aiSuggestionEngine';
+import { AISuggestion } from '../../utils/openAIAssistant';
 import { useNotifications } from '../Common/Notifications/NotificationProvider';
 import './AISuggestionPanel.css';
 
@@ -10,6 +10,7 @@ interface AISuggestionPanelProps {
   isVisible: boolean;
   onToggle: () => void;
   isProcessing?: boolean;
+  onAnalyze: () => void; // Новый prop для ручного анализа
 }
 
 const AISuggestionPanel: React.FC<AISuggestionPanelProps> = ({
@@ -18,7 +19,8 @@ const AISuggestionPanel: React.FC<AISuggestionPanelProps> = ({
   onRejectSuggestion,
   isVisible,
   onToggle,
-  isProcessing = false
+  isProcessing = false,
+  onAnalyze
 }) => {
   const [expandedSuggestion, setExpandedSuggestion] = useState<string | null>(null);
   const [previewMode, setPreviewMode] = useState<string | null>(null);
@@ -94,22 +96,32 @@ const AISuggestionPanel: React.FC<AISuggestionPanelProps> = ({
             </div>
           )}
         </div>
-        <button 
-          className="panel-close-btn"
-          onClick={onToggle}
-          title="Hide AI Suggestions"
-        >
-          ✕
-        </button>
+        <div className="panel-actions">
+          <button 
+            className="analyze-button"
+            onClick={onAnalyze}
+            disabled={isProcessing}
+            title="Analyze specification for suggestions"
+          >
+            {isProcessing ? '⟳' : '🔍'} Analyze
+          </button>
+          <button 
+            className="panel-close-btn"
+            onClick={onToggle}
+            title="Hide AI Suggestions"
+          >
+            ✕
+          </button>
+        </div>
       </div>
 
       <div className="panel-content">
         {suggestions.length === 0 ? (
           <div className="no-suggestions">
             <div className="no-suggestions-icon">🎯</div>
-            <p className="no-suggestions-title">All caught up!</p>
+            <p className="no-suggestions-title">Ready for analysis!</p>
             <p className="no-suggestions-text">
-              Your specification looks good. Make some changes and I'll suggest improvements.
+              Click the "Analyze" button above to get AI-powered suggestions for your OpenAPI specification.
             </p>
           </div>
         ) : (

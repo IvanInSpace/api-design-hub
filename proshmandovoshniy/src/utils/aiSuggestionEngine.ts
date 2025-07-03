@@ -1,25 +1,6 @@
 import * as yaml from 'js-yaml';
 import { OpenAPISpec, PathItem, Operation, Tag } from '../types/openapi';
-
-export interface AISuggestion {
-  id: string;
-  type: 'path' | 'operation' | 'schema' | 'component' | 'parameter';
-  title: string;
-  description: string;
-  yamlContent: string;
-  insertPosition: {
-    path: string[];
-    line?: number;
-  };
-  confidence: number;
-  reasoning: string;
-}
-
-export interface AnalysisContext {
-  spec: OpenAPISpec;
-  recentChanges: string[];
-  lastModifiedSection?: string;
-}
+import { AISuggestion, AnalysisContext } from './openAIAssistant';
 
 class AISuggestionEngine {
   private static readonly COMMON_PATTERNS = {
@@ -94,7 +75,8 @@ class AISuggestionEngine {
             path: ['paths', pathName]
           },
           confidence: 0.9,
-          reasoning: `Tag "${tag.name}" exists but has no associated endpoints. Adding RESTful CRUD operations would provide a complete API interface.`
+          reasoning: `Tag "${tag.name}" exists but has no associated endpoints. Adding RESTful CRUD operations would provide a complete API interface.`,
+          category: 'completion'
         };
         
         suggestions.push(suggestion);
@@ -188,17 +170,18 @@ class AISuggestionEngine {
     Object.keys(spec.components.schemas).forEach(schemaName => {
       if (!usedSchemas.has(schemaName)) {
         suggestions.push({
-          id: `use-schema-${schemaName}`,
-          type: 'path',
-          title: `Create endpoints for ${schemaName}`,
-          description: `Add API endpoints that use the ${schemaName} schema`,
-          yamlContent: this.generateSchemaBasedPath(schemaName),
-          insertPosition: {
-            path: ['paths', `/${schemaName.toLowerCase()}`]
-          },
-          confidence: 0.6,
-          reasoning: `Schema "${schemaName}" is defined but not used in any endpoints. Consider creating REST endpoints to utilize this schema.`
-        });
+        id: `use-schema-${schemaName}`,
+        type: 'path',
+        title: `Create endpoints for ${schemaName}`,
+        description: `Add API endpoints that use the ${schemaName} schema`,
+        yamlContent: this.generateSchemaBasedPath(schemaName),
+        insertPosition: {
+        path: ['paths', `/${schemaName.toLowerCase()}`]
+        },
+        confidence: 0.6,
+        reasoning: `Schema "${schemaName}" is defined but not used in any endpoints. Consider creating REST endpoints to utilize this schema.`,
+          category: 'enhancement'
+      });
       }
     });
 
@@ -221,7 +204,8 @@ class AISuggestionEngine {
           path: ['components']
         },
         confidence: 0.5,
-        reasoning: 'Adding a components section will help organize reusable schemas and improve API maintainability.'
+        reasoning: 'Adding a components section will help organize reusable schemas and improve API maintainability.',
+        category: 'best-practice'
       });
     }
 
@@ -237,7 +221,8 @@ class AISuggestionEngine {
           path: ['components', 'parameters']
         },
         confidence: 0.4,
-        reasoning: 'Common parameters for pagination and filtering can be reused across multiple endpoints.'
+        reasoning: 'Common parameters for pagination and filtering can be reused across multiple endpoints.',
+        category: 'best-practice'
       });
     }
 
@@ -261,7 +246,8 @@ class AISuggestionEngine {
         path: ['paths', path, method]
       },
       confidence,
-      reasoning: `${method.toUpperCase()} operation is commonly used for ${description.toLowerCase()} in REST APIs.`
+      reasoning: `${method.toUpperCase()} operation is commonly used for ${description.toLowerCase()} in REST APIs.`,
+      category: 'completion'
     };
   }
 

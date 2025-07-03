@@ -59,11 +59,12 @@ function AppInner() {
     acceptSuggestion,
     rejectSuggestion,
     refreshSuggestions,
-    clearAllSuggestions
+    clearAllSuggestions,
+    analyzeManually
   } = useAISuggestions(yamlContent, handleYamlChange, {
     debounceMs: 1500,
     maxSuggestions: 8,
-    enableAutoAnalysis: true,
+    enableAutoAnalysis: false, // Отключаем автоматический анализ
     assistant: openAIAssistant
   });
 
@@ -173,6 +174,7 @@ function AppInner() {
         isVisible={aiPanelVisible}
         onToggle={() => setAiPanelVisible(!aiPanelVisible)}
         isProcessing={isAnalyzing}
+        onAnalyze={analyzeManually}
       />
       
       <NotificationContainer />

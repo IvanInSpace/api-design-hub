@@ -53,7 +53,7 @@ const [usage, setUsage] = useState({ requests: 0, tokens: 0 });
     if (apiKey) {
       const config: OpenAIConfig = {
         apiKey,
-        model: 'gpt-4',
+        model: 'gpt-4o-mini',
         temperature: 0.3
       };
       setAssistant(new OpenAIAssistant(config));

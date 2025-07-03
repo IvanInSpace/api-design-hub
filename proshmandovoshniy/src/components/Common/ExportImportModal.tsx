@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import * as yaml from 'js-yaml';
 import { useNotifications } from './Notifications/NotificationProvider';
 import './ExportImportModal.css';
 
@@ -33,7 +34,6 @@ const ExportImportModal: React.FC<ExportImportModalProps> = ({
 
       if (exportFormat === 'json') {
         // Convert YAML to JSON
-        const yaml = require('js-yaml');
         const parsed = yaml.load(yamlContent);
         content = JSON.stringify(parsed, null, 2);
         mimeType = 'application/json';
@@ -63,7 +63,6 @@ const ExportImportModal: React.FC<ExportImportModalProps> = ({
       let content = yamlContent;
       
       if (exportFormat === 'json') {
-        const yaml = require('js-yaml');
         const parsed = yaml.load(yamlContent);
         content = JSON.stringify(parsed, null, 2);
       }
@@ -87,12 +86,10 @@ const ExportImportModal: React.FC<ExportImportModalProps> = ({
       try {
         parsed = JSON.parse(importText);
       } catch {
-        const yaml = require('js-yaml');
         parsed = yaml.load(importText);
       }
 
       // Convert back to YAML for consistency
-      const yaml = require('js-yaml');
       const yamlString = yaml.dump(parsed, { indent: 2, lineWidth: 120 });
       
       onImport(yamlString);
@@ -199,7 +196,7 @@ const ExportImportModal: React.FC<ExportImportModalProps> = ({
                     <pre className="preview-text">
                       {exportFormat === 'yaml' 
                         ? yamlContent.substring(0, 500) + (yamlContent.length > 500 ? '...' : '')
-                        : JSON.stringify(require('js-yaml').load(yamlContent), null, 2).substring(0, 500) + '...'
+                        : JSON.stringify(yaml.load(yamlContent), null, 2).substring(0, 500) + '...'
                       }
                     </pre>
                   </div>

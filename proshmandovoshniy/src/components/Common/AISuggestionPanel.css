@@ -90,6 +90,39 @@
   gap: 12px;
 }
 
+.panel-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.analyze-button {
+  background: var(--color-primary);
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s ease;
+}
+
+.analyze-button:hover:not(:disabled) {
+  background: var(--color-primary);
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+.analyze-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
 .panel-icon {
   font-size: 20px;
 }
