@@ -219,6 +219,16 @@ function getDefaultData(type: BlockType['type']): any {
         name: 'example',
         description: ''
       };
+    case 'component':
+      return {
+        schemas: {},
+        responses: {},
+        parameters: {}
+      };
+    case 'security':
+      return {
+        securitySchemes: {}
+      };
     default:
       return {};
   }

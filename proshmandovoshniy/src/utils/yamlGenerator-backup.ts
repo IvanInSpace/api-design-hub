@@ -39,6 +39,19 @@ export class YamlGenerator {
             spec.security = block.data.globalSecurity;
           }
           break;
+        case 'component':
+          if (!spec.components) spec.components = {};
+          this.mergeComponentsObject(spec.components, block.data);
+          break;
+        case 'security':
+          if (!spec.components) spec.components = {};
+          if (block.data.securitySchemes) {
+            spec.components.securitySchemes = {
+              ...spec.components.securitySchemes,
+              ...block.data.securitySchemes
+            };
+          }
+          break;
       }
     });
 
@@ -164,6 +177,29 @@ export class YamlGenerator {
     return operation;
   }
 
+  private static mergeComponentsObject(components: any, blockData: any) {
+    if (blockData.schemas) {
+      components.schemas = {
+        ...components.schemas,
+        ...blockData.schemas
+      };
+    }
+    
+    if (blockData.responses) {
+      components.responses = {
+        ...components.responses,
+        ...blockData.responses
+      };
+    }
+    
+    if (blockData.parameters) {
+      components.parameters = {
+        ...components.parameters,
+        ...blockData.parameters
+      };
+    }
+  }
+
   private static generateTagObject(data: any): TagObject {
     const tag: TagObject = {
       name: data.name || 'default'
@@ -177,23 +213,6 @@ export class YamlGenerator {
     }
 
     return tag;
-  }
-
-  private static mergeComponentsObject(components: any, blockData: any) {
-    if (blockData.schemas) {
-      if (!components.schemas) components.schemas = {};
-      Object.assign(components.schemas, blockData.schemas);
-    }
-
-    if (blockData.responses) {
-      if (!components.responses) components.responses = {};
-      Object.assign(components.responses, blockData.responses);
-    }
-
-    if (blockData.parameters) {
-      if (!components.parameters) components.parameters = {};
-      Object.assign(components.parameters, blockData.parameters);
-    }
   }
 
   private static generateExampleForMethod(method: string): any {
@@ -337,10 +356,10 @@ export class YamlGenerator {
         });
       }
 
-      // Generate component block
+      // Generate component blocks
       if (spec.components && (spec.components.schemas || spec.components.responses || spec.components.parameters)) {
         blocks.push({
-          id: `component-${Date.now()}`,
+          id: `components-${Date.now()}`,
           type: 'component',
           title: 'Components',
           expanded: false,
@@ -352,16 +371,15 @@ export class YamlGenerator {
         });
       }
 
-      // Generate security block
-      if (spec.components?.securitySchemes || spec.security) {
+      // Generate security blocks
+      if (spec.components?.securitySchemes) {
         blocks.push({
           id: `security-${Date.now()}`,
           type: 'security',
-          title: 'Security',
+          title: 'Security Schemes',
           expanded: false,
           data: {
-            securitySchemes: spec.components?.securitySchemes || {},
-            globalSecurity: spec.security || []
+            securitySchemes: spec.components.securitySchemes
           }
         });
       }

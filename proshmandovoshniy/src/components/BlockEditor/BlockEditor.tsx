@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { BlockType } from '../../types/openapi';
 import PathForm from './Forms/PathForm';
+import ComponentForm from './Forms/ComponentForm';
+import SecurityForm from './Forms/SecurityForm';
 import TemplateSelector from '../Common/TemplateSelector';
 import SearchAndFilter from '../Common/SearchAndFilter';
 import './BlockEditor.css';
@@ -324,11 +326,27 @@ const BlockContent: React.FC<BlockContentProps> = ({ block, onUpdate }) => {
         </div>
       );
 
+    case 'component':
+      return (
+        <ComponentForm
+          data={block.data}
+          onUpdate={onUpdate}
+        />
+      );
+
+    case 'security':
+      return (
+        <SecurityForm
+          data={block.data}
+          onUpdate={onUpdate}
+        />
+      );
+
     default:
       return (
         <div className="block-form">
           <p className="placeholder-text">
-            Configuration for {block.type} blocks coming soon...
+            Unknown block type: {block.type}
           </p>
         </div>
       );
